@@ -34,9 +34,12 @@ struct scene_structure {
 	cgp::curve_drawable curve;    // A set of vertices displayed as a curve
 
 	cgp::mesh shape;
+	cgp::mesh floor;
 	cgp::buffer<cgp::vec3> initial_position;
 	float initial_time;
 	cgp::mesh_drawable shape_visual;
+	cgp::mesh_drawable floor_visual;
+	float wind_str;
 
 	cgp::timer_basic timer; // A timer to have access to the elapsed time
 	cgp::scene_environment_basic_camera_spherical_coords environment; // Standard environment controler
@@ -49,9 +52,13 @@ struct scene_structure {
 	void initialize();  // Standard initialization to be called before the animation loop
 	void display();     // The frame display to be called within the animation loop
 	void display_gui(); // The display of the GUI, also called within the animation loop
+
+	
 	void evolve_shape();
 
 };
+
+float sloped_floor(float x, float limit, float slope);
 
 
 
