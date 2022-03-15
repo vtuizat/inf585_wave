@@ -11,9 +11,9 @@ void scene_structure::initialize()
 {
 	// Initialize the shapes of the scene
 	// ***************************************** //
-	int N = 100;
-	int Lfactor = 5;
-	int Wfactor = 3;
+	int N = 50;
+	int Lfactor = 20;
+	int Wfactor = 20;
 	// Set the behavior of the camera and its initial position
 	environment.camera.axis = camera_spherical_coordinates_axis::z;
 	//environment.camera.look_at({ 5.0f,-4.0f,2.0f }, { 0,0,0 });
@@ -34,7 +34,7 @@ void scene_structure::initialize()
 	}
 	floor = mesh_primitive_grid({ 0,0,0 }, { 1,0,0 }, { 1,1,0 }, { 0,1,0 }, N, Lfactor* N);
 	for (int i = 0; i < N * N * Lfactor; i++){
-		floor.position.at(i)=vec3(Wfactor * floor.position.at(i).x, Lfactor * floor.position.at(i).y,  sloped_floor(5 * floor.position.at(i).y, 2.0, 0.23) -1.2 );//- 3.2);
+		floor.position.at(i)=vec3(Wfactor * floor.position.at(i).x, Lfactor * floor.position.at(i).y,  sloped_floor(Lfactor * floor.position.at(i).y, 2.0, 0.23) -floor_offset );//- 3.2);
 	}
 	environment.camera.look_at({ 5.0f,-4.0f,2.0f }, shape.position.at(N * N * Lfactor / 2 - N/2 ));
 	//shape.position.at(N/2, 5*N/2, n/2)
@@ -97,6 +97,7 @@ void scene_structure::display_gui()
 	ImGui::SliderFloat("Time Scale", &timer.scale, 0.0f, 2.0f, "%.1f");
 	ImGui::SliderFloat("Wind Strenght", &wind_str, 0.0f, 10.0f, "%.1f");
 	ImGui::SliderFloat("Wind angle", &wind_angle, 0.0f, 3.14f, "%.01f");
+	ImGui::SliderFloat("floor offset", &floor_offset, 0.0f, 10.f, "%.1f");
 	ImGui::Checkbox("Wireframe", &gui.display_wireframe);
 	bool const restart = ImGui::Button("Restart");
 
@@ -112,12 +113,13 @@ void scene_structure::evolve_shape()
 
 	//wind
 	vec3 wind_dir = normalize(vec3(std::cos(wind_angle), std::sin(wind_angle), 0.0));
+	vec3 wind_dir_2 = normalize(vec3(std::cos(wind_angle), -std::sin(wind_angle), 0.0));
 	//wind_str = 3.f;
 
 	float R = 0.007065f * std::pow(wind_str, 2.5) / 2; //0.06;
 	float w = 9.81f * std::sqrt(2.f/3.f) / wind_str ; //4.0;
 
-	float K = 10 * 9.81f * 2 / 3 / wind_str / wind_str;   //10.0;
+	float K = 9.81f * 2 / 3 / wind_str / wind_str;   //10.0;
 	vec3 K_vec = K * wind_dir;
 	float lambda = 1.5;
 
@@ -130,23 +132,28 @@ void scene_structure::evolve_shape()
         
 		vec3 const& p0 = initial_position[k];
         vec3& p        = shape.position[k];
-		float depth =  -1*sloped_floor( p.y, 02.0, 0.23)+1.2;
+		float depth =  -1*sloped_floor( p0.y, 02.0, 0.23)+floor_offset;
 		float K_depth = K / std::sqrt( std::tanh(K * depth));
 		float w_depth = 0;//ck
 
-		float phi = w * timer.t + K_integration(K ,p0.y, &valley_floor);
-		float alpha = -1 * K_depth * (p0.x * dot(wind_dir, vec3(1,0,0)) + p0.y * dot(wind_dir, vec3(0,1,0)));
-		float Sx = 1 / (1 - std::exp(-1 * K * depth));
-		float Sz = Sx * (1 - std::exp(-1 * K * depth));
+		float phi = - w * timer.t + K_depth * dot(wind_dir, p0) ;//K_integration(K ,dot(wind_dir, p0), &valley_floor);
+		//float alpha = -1 * K_depth * dot(wind_dir_2, p0);
+		float alpha = 0.23 * std::exp(-0.1 * K_depth * depth ) ;
+		float Sx = 1 / (1 - std::exp(-1 * K_depth * depth));
+		float Sz = Sx * (1 - std::exp(-1 * K_depth * depth));
 		
         //p.x = p0.x + R * dot(wind_dir, vec3(1,0,0)) * std::sin(K * p0.y - w * timer.t - lambda * (p.z - p0.z) * (timer.t - initial_time));
-		//p.y = p0.y + R  * std::sin( K_depth * (p0.x * dot(wind_dir, vec3(1,0,0)) + p0.y * dot(wind_dir, vec3(0,1,0))) - w * timer.t - lambda * (p.z - p0.z) * (timer.t - initial_time));
-		//p.z = p0.z - R * std::cos(K_depth * (p0.x * dot(wind_dir, vec3(1,0,0)) + p0.y * dot(wind_dir, vec3(0,1,0))) - w * timer.t - lambda * (p.z - p0.z) * (timer.t - initial_time));
-		
+		//p.y = p0.y + R  * std::sin( K_depth * dot(wind_dir, p0) - w * timer.t - lambda * (p.z - p0.z) * (timer.t - initial_time));
+		//p.z = p0.z - R * std::cos(K_depth * dot(wind_dir, p0)  - w * timer.t - lambda * (p.z - p0.z) * (timer.t - initial_time));
+
+
+		//p.y= p0.y + 2*R * std::cos(phi + alpha - lambda * (p.z - p0.z) * (timer.t - initial_time));
+		//p.z= p0.z +3*R * std::sin(phi + alpha - lambda * (p.z - p0.z) * (timer.t - initial_time));
+
 		p.y = p0.y + R * std::cos(alpha) * Sx * std::sin(phi) +
-			std::sin(alpha) * Sz * std::cos(phi);
-		p.z = p0.z + R * std::cos(alpha) * Sz * std::sin(phi) +
-			std::sin(alpha) * Sx * std::cos(phi);
+			 std::sin(alpha) * Sz * std::cos(phi);
+		p.z = p0.z + R *  std::cos(alpha) * Sz * std::sin(phi) +
+			 std::sin(alpha) * Sx * std::cos(phi);
 			
     }
 }

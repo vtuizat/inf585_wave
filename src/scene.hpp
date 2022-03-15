@@ -39,8 +39,9 @@ struct scene_structure {
 	float initial_time;
 	cgp::mesh_drawable shape_visual;
 	cgp::mesh_drawable floor_visual;
-	float wind_str;
-	float wind_angle;
+	float wind_str = 2.0;
+	float wind_angle = 1.6;
+	float floor_offset = 5.0;
 
 	cgp::timer_basic timer; // A timer to have access to the elapsed time
 	cgp::scene_environment_basic_camera_spherical_coords environment; // Standard environment controler
