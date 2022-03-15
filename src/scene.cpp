@@ -134,19 +134,19 @@ void scene_structure::evolve_shape()
 		float K_depth = K / std::sqrt( std::tanh(K * depth));
 		float w_depth = 0;//ck
 
-		float phi = -w * timer.t + K_integration(K ,p0.y, &valley_floor);
+		float phi = w * timer.t + K_integration(K ,p0.y, &valley_floor);
 		float alpha = -1 * K_depth * (p0.x * dot(wind_dir, vec3(1,0,0)) + p0.y * dot(wind_dir, vec3(0,1,0)));
 		float Sx = 1 / (1 - std::exp(-1 * K * depth));
 		float Sz = Sx * (1 - std::exp(-1 * K * depth));
 		
         //p.x = p0.x + R * dot(wind_dir, vec3(1,0,0)) * std::sin(K * p0.y - w * timer.t - lambda * (p.z - p0.z) * (timer.t - initial_time));
-		p.y = p0.y + R  * std::sin( K_depth * (p0.x * dot(wind_dir, vec3(1,0,0)) + p0.y * dot(wind_dir, vec3(0,1,0))) - w * timer.t - lambda * (p.z - p0.z) * (timer.t - initial_time));
-		p.z = p0.z - R * std::cos(K_depth * (p0.x * dot(wind_dir, vec3(1,0,0)) + p0.y * dot(wind_dir, vec3(0,1,0))) - w * timer.t - lambda * (p.z - p0.z) * (timer.t - initial_time));
+		//p.y = p0.y + R  * std::sin( K_depth * (p0.x * dot(wind_dir, vec3(1,0,0)) + p0.y * dot(wind_dir, vec3(0,1,0))) - w * timer.t - lambda * (p.z - p0.z) * (timer.t - initial_time));
+		//p.z = p0.z - R * std::cos(K_depth * (p0.x * dot(wind_dir, vec3(1,0,0)) + p0.y * dot(wind_dir, vec3(0,1,0))) - w * timer.t - lambda * (p.z - p0.z) * (timer.t - initial_time));
 		
-		/* p.y = p0.y + R * std::cos(alpha) * Sx * std::sin(phi) +
+		p.y = p0.y + R * std::cos(alpha) * Sx * std::sin(phi) +
 			std::sin(alpha) * Sz * std::cos(phi);
 		p.z = p0.z + R * std::cos(alpha) * Sz * std::sin(phi) +
-			std::sin(alpha) * Sx * std::cos(phi); */
+			std::sin(alpha) * Sx * std::cos(phi);
 			
     }
 }
