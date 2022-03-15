@@ -58,10 +58,11 @@ struct scene_structure {
 	void evolve_shape();
 
 };
+float K_integration(float K ,float x0, float (*h)(float, float, float));
 
 float sloped_floor(float x, float limit, float slope);
-
-
+float valley_floor(float x, float position, float width);
+float valley_wall(float x, float position, float width);
 
 
 

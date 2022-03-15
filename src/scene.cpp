@@ -12,6 +12,8 @@ void scene_structure::initialize()
 	// Initialize the shapes of the scene
 	// ***************************************** //
 	int N = 100;
+	int Lfactor = 5;
+	int Wfactor = 3;
 	// Set the behavior of the camera and its initial position
 	environment.camera.axis = camera_spherical_coordinates_axis::z;
 	//environment.camera.look_at({ 5.0f,-4.0f,2.0f }, { 0,0,0 });
@@ -26,15 +28,15 @@ void scene_structure::initialize()
 
 
 	
-	shape = mesh_primitive_grid({ 0,0,0 }, { 1,0,0 }, { 1,1,0 }, { 0,1,0 }, N, 5* N);
-	for (int i = 0; i < N * N * 5; i++){
-		shape.position.at(i)=vec3(2 * shape.position.at(i).x, 5 * shape.position.at(i).y, shape.position.at(i).z);
+	shape = mesh_primitive_grid({ 0,0,0 }, { 1,0,0 }, { 1,1,0 }, { 0,1,0 }, N, Lfactor* N);
+	for (int i = 0; i < N * N * Lfactor; i++){
+		shape.position.at(i)=vec3(Wfactor * shape.position.at(i).x, Lfactor * shape.position.at(i).y, shape.position.at(i).z);
 	}
-	floor = mesh_primitive_grid({ 0,0,0 }, { 1,0,0 }, { 1,1,0 }, { 0,1,0 }, N, 5* N);
-	for (int i = 0; i < N * N * 5; i++){
-		floor.position.at(i)=vec3(2 * floor.position.at(i).x, 5 * floor.position.at(i).y,  sloped_floor(5 * floor.position.at(i).y, 2.0, 0.23) - 1.2);
+	floor = mesh_primitive_grid({ 0,0,0 }, { 1,0,0 }, { 1,1,0 }, { 0,1,0 }, N, Lfactor* N);
+	for (int i = 0; i < N * N * Lfactor; i++){
+		floor.position.at(i)=vec3(Wfactor * floor.position.at(i).x, Lfactor * floor.position.at(i).y,  sloped_floor(5 * floor.position.at(i).y, 2.0, 0.23) -1.2 );//- 3.2);
 	}
-	environment.camera.look_at({ 5.0f,-4.0f,2.0f }, shape.position.at(N * N * 5 - N/2 ));
+	environment.camera.look_at({ 5.0f,-4.0f,2.0f }, shape.position.at(N * N * Lfactor / 2 - N/2 ));
 	//shape.position.at(N/2, 5*N/2, n/2)
 	initial_position = shape.position;
 	initial_time = timer.t;
@@ -115,7 +117,7 @@ void scene_structure::evolve_shape()
 	float R = 0.007065f * std::pow(wind_str, 2.5) / 2; //0.06;
 	float w = 9.81f * std::sqrt(2.f/3.f) / wind_str ; //4.0;
 
-	float K = w * w ;/// 9.81f;   //10.0;
+	float K = 10 * 9.81f * 2 / 3 / wind_str / wind_str;   //10.0;
 	vec3 K_vec = K * wind_dir;
 	float lambda = 1.5;
 
@@ -128,25 +130,34 @@ void scene_structure::evolve_shape()
         
 		vec3 const& p0 = initial_position[k];
         vec3& p        = shape.position[k];
-		float depth = 1.2 - sloped_floor( p.y, 02.0, 0.23);
+		float depth =  -1*sloped_floor( p.y, 02.0, 0.23)+1.2;
 		float K_depth = K / std::sqrt( std::tanh(K * depth));
 		float w_depth = 0;//ck
 
-		float phi = w * timer.t ;
-		float alpha = -1 * K_depth * p0.y;
-		float Sx = 1 / (1 - std::exp(-1 * K_y * depth));
-		float Sz = Sx * (1 - std::exp(-1 * K_z * depth));
+		float phi = -w * timer.t + K_integration(K ,p0.y, &valley_floor);
+		float alpha = -1 * K_depth * (p0.x * dot(wind_dir, vec3(1,0,0)) + p0.y * dot(wind_dir, vec3(0,1,0)));
+		float Sx = 1 / (1 - std::exp(-1 * K * depth));
+		float Sz = Sx * (1 - std::exp(-1 * K * depth));
 		
         //p.x = p0.x + R * dot(wind_dir, vec3(1,0,0)) * std::sin(K * p0.y - w * timer.t - lambda * (p.z - p0.z) * (timer.t - initial_time));
 		p.y = p0.y + R  * std::sin( K_depth * (p0.x * dot(wind_dir, vec3(1,0,0)) + p0.y * dot(wind_dir, vec3(0,1,0))) - w * timer.t - lambda * (p.z - p0.z) * (timer.t - initial_time));
 		p.z = p0.z - R * std::cos(K_depth * (p0.x * dot(wind_dir, vec3(1,0,0)) + p0.y * dot(wind_dir, vec3(0,1,0))) - w * timer.t - lambda * (p.z - p0.z) * (timer.t - initial_time));
 		
-		/*p.y = p0.y + R * std::cos(alpha) * Sx * std::sin(phi) +
+		/* p.y = p0.y + R * std::cos(alpha) * Sx * std::sin(phi) +
 			std::sin(alpha) * Sz * std::cos(phi);
 		p.z = p0.z + R * std::cos(alpha) * Sz * std::sin(phi) +
-			std::sin(alpha) * Sx * std::cos(phi);
-		*/	
+			std::sin(alpha) * Sx * std::cos(phi); */
+			
     }
+}
+
+float K_integration(float K ,float x0, float (*h)(float, float, float)){
+	float sum = 0;
+	
+	for (int i = 0; i < 100; i++){
+		sum+= K / std::sqrt(K * h(i * x0/100, 2.0, 0.23)) * x0 /100;
+	}
+	return sum;
 }
 
 float sloped_floor(float x, float limit, float slope){
@@ -154,7 +165,19 @@ float sloped_floor(float x, float limit, float slope){
 		return slope * limit;
 	}
 	else {
-		return slope * (x);
+		return  slope * (x);
 	}
+}
+
+float valley_floor(float x, float position, float width){
+	
+	if ( x >  position - 3 * width) if ( x < position + 3 * width) return 3.0;
+	return 0.6;
+}
+
+float valley_wall(float x, float position, float width){
+	
+	if ( x >  position ) return 13.0;
+	return 0.6;
 }
 
