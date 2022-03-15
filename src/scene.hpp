@@ -39,8 +39,8 @@ struct scene_structure {
 	float initial_time;
 	cgp::mesh_drawable shape_visual;
 	cgp::mesh_drawable floor_visual;
-	float wind_str;
-	float wind_angle;
+	float wind_str = 1.0;
+	float wind_angle = 1.6;
 
 	cgp::timer_basic timer; // A timer to have access to the elapsed time
 	cgp::scene_environment_basic_camera_spherical_coords environment; // Standard environment controler
@@ -61,6 +61,7 @@ struct scene_structure {
 float K_integration(float K ,float x0, float (*h)(float, float, float));
 
 float sloped_floor(float x, float limit, float slope);
+float atan_floor(float x);
 float valley_floor(float x, float position, float width);
 float valley_wall(float x, float position, float width);
 
