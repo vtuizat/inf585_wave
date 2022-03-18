@@ -34,7 +34,10 @@ void scene_structure::initialize()
 	}
 	floor = mesh_primitive_grid({ 0,0,0 }, { 1,0,0 }, { 1,1,0 }, { 0,1,0 }, N, Lfactor* N);
 	for (int i = 0; i < N * N * Lfactor; i++){
-		floor.position.at(i)=vec3(Wfactor * floor.position.at(i).x, Lfactor * floor.position.at(i).y,  atan_floor(floor.position.at(i).y)-floor_offset);//- 3.2);
+		floor.position.at(i)=vec3(	Wfactor * floor.position.at(i).x,
+									Lfactor * floor.position.at(i).y,
+									(atan_floor(floor.position.at(i).y, floor_dist_from_shore, floor_steepness)-floor_offset)
+									* noise_perlin(floor.position.at(i).x, octave, persistance, gain));
 	}
 	environment.camera.look_at({ 5.0f,-4.0f,2.0f }, shape.position.at(N * N * Lfactor / 2 - N/2 ));
 	//shape.position.at(N/2, 5*N/2, n/2)
@@ -98,6 +101,11 @@ void scene_structure::display_gui()
 	ImGui::SliderFloat("Wind Strenght", &wind_str, 0.0f, 10.0f, "%.1f");
 	ImGui::SliderFloat("Wind angle", &wind_angle, 0.0f, 3.14f, "%.01f");
 	ImGui::SliderFloat("floor offset", &floor_offset, 0.0f, 10.f, "%.1f");
+	ImGui::SliderFloat("floor steepness", &floor_steepness, 10.0f, 60.0f, "%10.0f");
+	ImGui::SliderFloat("dist of inflexion", &floor_dist_from_shore, 0.0f, 1.0f, "%.1f");
+	ImGui::SliderInt("octave", &octave, 1, 5, "%1d");
+	ImGui::SliderFloat("persistance", &persistance, 0.0f, 3.0f, "%0.1f");
+	ImGui::SliderFloat("gain", &gain, 0.0f, 10.0f, "%.1f");
 	ImGui::Checkbox("Wireframe", &gui.display_wireframe);
 	bool const restart = ImGui::Button("Restart");
 
@@ -179,8 +187,8 @@ float sloped_floor(float x, float limit, float slope){
 	}
 }
 
-float atan_floor(float x){
-	return 0.5*(std::atan(40*(x-0.4))-1.7);
+float atan_floor(float x, float dist_from_shore, float steepness){
+	return 0.5*(std::atan(steepness*(x-dist_from_shore))-1.7);
 }
 
 float valley_floor(float x, float position, float width){

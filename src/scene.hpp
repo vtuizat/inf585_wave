@@ -23,7 +23,7 @@ struct scene_structure {
 	// ****************************** //
 
 	
-	cgp::mesh_drawable global_frame;  // The standard global frame
+	cgp::mesh_drawable global_frame; // The standard global frame
 	
 	// Different primitives displayed as mesh_drawable
 	cgp::mesh_drawable cube;     
@@ -58,13 +58,20 @@ struct scene_structure {
 	float wind_str = 2.0;
 	float wind_angle = 1.6;
 	float floor_offset = 5.0;
+	float floor_steepness = 40;
+	float floor_dist_from_shore = 0.4;
+	
+	int octave = 3;
+	float persistance = 0.2;
+	float gain = 1.0;
+	
 	int N = 50;
 
 };
 float K_integration(float K ,float x0, float (*h)(float, float, float));
 
 float sloped_floor(float x, float limit, float slope);
-float atan_floor(float x);
+float atan_floor(float x, float dist_from_shore, float steepness);
 float valley_floor(float x, float position, float width);
 float valley_wall(float x, float position, float width);
 
