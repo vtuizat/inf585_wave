@@ -5,6 +5,7 @@
 */
 
 #include "cgp/cgp.hpp"
+#include "particles/particles.hpp"
 
 
 
@@ -44,6 +45,8 @@ struct scene_structure {
 	cgp::scene_environment_basic_camera_spherical_coords environment; // Standard environment controler
 	gui_parameters gui;                       // Standard GUI element storage
 
+	particle_system_structure particle_system;
+
 	// ****************************** //
 	// Functions
 	// ****************************** //
@@ -54,6 +57,8 @@ struct scene_structure {
 
 	
 	void evolve_shape();
+	void evolve_foam(float t0);
+	void create_foam_train(float t0, int k, float foam_th);
 	
 	float wind_str = 2.0;
 	float wind_angle = 1.6;
@@ -64,10 +69,11 @@ struct scene_structure {
 	int octave = 3;
 	float persistance = 0.2;
 	float gain = 1.0;
-	
+
 	int N = 50;
 
 };
+
 float K_integration(float K ,float x0, float (*h)(float, float, float));
 
 float sloped_floor(float x, float limit, float slope);

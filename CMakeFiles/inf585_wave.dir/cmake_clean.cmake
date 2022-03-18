@@ -82,6 +82,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/inf585_wave.dir/mnt/c/Users/hugon/INF585/code_inf585/library/third_party/src/lodepng/lodepng.cpp.o"
   "CMakeFiles/inf585_wave.dir/mnt/c/Users/hugon/INF585/code_inf585/library/third_party/src/simplexnoise/simplexnoise1234.cpp.o"
   "CMakeFiles/inf585_wave.dir/src/main.cpp.o"
+  "CMakeFiles/inf585_wave.dir/src/particles/particles.cpp.o"
   "CMakeFiles/inf585_wave.dir/src/scene.cpp.o"
   "inf585_wave"
   "inf585_wave.pdb"

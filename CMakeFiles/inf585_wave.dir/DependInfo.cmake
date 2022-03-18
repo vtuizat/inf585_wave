@@ -87,6 +87,7 @@ set(CMAKE_DEPENDS_CHECK_CXX
   "/mnt/c/Users/hugon/INF585/code_inf585/library/third_party/src/lodepng/lodepng.cpp" "/mnt/c/Users/hugon/INF585/code_inf585/scenes/inf585/inf585_wave/CMakeFiles/inf585_wave.dir/mnt/c/Users/hugon/INF585/code_inf585/library/third_party/src/lodepng/lodepng.cpp.o"
   "/mnt/c/Users/hugon/INF585/code_inf585/library/third_party/src/simplexnoise/simplexnoise1234.cpp" "/mnt/c/Users/hugon/INF585/code_inf585/scenes/inf585/inf585_wave/CMakeFiles/inf585_wave.dir/mnt/c/Users/hugon/INF585/code_inf585/library/third_party/src/simplexnoise/simplexnoise1234.cpp.o"
   "/mnt/c/Users/hugon/INF585/code_inf585/scenes/inf585/inf585_wave/src/main.cpp" "/mnt/c/Users/hugon/INF585/code_inf585/scenes/inf585/inf585_wave/CMakeFiles/inf585_wave.dir/src/main.cpp.o"
+  "/mnt/c/Users/hugon/INF585/code_inf585/scenes/inf585/inf585_wave/src/particles/particles.cpp" "/mnt/c/Users/hugon/INF585/code_inf585/scenes/inf585/inf585_wave/CMakeFiles/inf585_wave.dir/src/particles/particles.cpp.o"
   "/mnt/c/Users/hugon/INF585/code_inf585/scenes/inf585/inf585_wave/src/scene.cpp" "/mnt/c/Users/hugon/INF585/code_inf585/scenes/inf585/inf585_wave/CMakeFiles/inf585_wave.dir/src/scene.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")

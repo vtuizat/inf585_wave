@@ -2364,6 +2364,33 @@ src/main.cpp.s:
 	$(MAKE) -f CMakeFiles/inf585_wave.dir/build.make CMakeFiles/inf585_wave.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
 
+src/particles/particles.o: src/particles/particles.cpp.o
+
+.PHONY : src/particles/particles.o
+
+# target to build an object file
+src/particles/particles.cpp.o:
+	$(MAKE) -f CMakeFiles/inf585_wave.dir/build.make CMakeFiles/inf585_wave.dir/src/particles/particles.cpp.o
+.PHONY : src/particles/particles.cpp.o
+
+src/particles/particles.i: src/particles/particles.cpp.i
+
+.PHONY : src/particles/particles.i
+
+# target to preprocess a source file
+src/particles/particles.cpp.i:
+	$(MAKE) -f CMakeFiles/inf585_wave.dir/build.make CMakeFiles/inf585_wave.dir/src/particles/particles.cpp.i
+.PHONY : src/particles/particles.cpp.i
+
+src/particles/particles.s: src/particles/particles.cpp.s
+
+.PHONY : src/particles/particles.s
+
+# target to generate assembly for a file
+src/particles/particles.cpp.s:
+	$(MAKE) -f CMakeFiles/inf585_wave.dir/build.make CMakeFiles/inf585_wave.dir/src/particles/particles.cpp.s
+.PHONY : src/particles/particles.cpp.s
+
 src/scene.o: src/scene.cpp.o
 
 .PHONY : src/scene.o
@@ -2649,6 +2676,9 @@ help:
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
+	@echo "... src/particles/particles.o"
+	@echo "... src/particles/particles.i"
+	@echo "... src/particles/particles.s"
 	@echo "... src/scene.o"
 	@echo "... src/scene.i"
 	@echo "... src/scene.s"

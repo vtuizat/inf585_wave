@@ -1,4 +1,5 @@
 #include "scene.hpp"
+#include <random>
 
 
 using namespace cgp;
@@ -47,6 +48,11 @@ void scene_structure::initialize()
 	shape_visual.shading.color = { 0.6f, 0.6f, 0.9f };
 	floor_visual.initialize(floor, "Deforming floor");
 	floor_visual.shading.color = { 0.6f, 0.6f, 0.0f };
+
+	float sphere_radius = 0.05f;
+	sphere.initialize(mesh_primitive_sphere(sphere_radius), "Sphere");
+	sphere.shading.color = { 1.0f, 1.0f, 1.0f };
+
 		// Reset the color of the shape to white (only the texture image will be seen)
 	shape_visual.shading.color = {1,1,1};
 
@@ -82,8 +88,26 @@ void scene_structure::display()
 	draw(shape_visual, environment);
 	if (gui.display_wireframe)
 		draw_wireframe(shape_visual, environment, { 0,0,0 });
+
+	particle_system.remove_old_particles(timer.t);
+
+	// Evaluate the positions and display the particles
+	int const N = particle_system.particles.size();
+	for (int k = 0; k < N; ++k)
+	{
+		// Current particle
+		particle_structure& particle = particle_system.particles[k];
+
+		// Evaluate the current position of the particle
+		vec3 const p = particle.evaluate_position(timer.t);
+
+		// Display the particle as a sphere
+		sphere.transform.translation = p;
+		draw(sphere, environment);
+	}
 	
 	evolve_shape();
+	evolve_foam(timer.t);
 	shape_visual.update_position(shape.position);
 
 	// Recompute normals on the CPU (given the position and the connectivity currently in the mesh structure)
@@ -132,7 +156,7 @@ void scene_structure::evolve_shape()
 	float lambda = 1.5;
 
 	float K_y = 1.0;
-	float K_z = 1.0;
+	float K_z = 20.0;
 	//std::cout << "R = " << R << " w = " << w << " K = " << K <<"\n";
     for(size_t k=0; k<M; ++k)
     {
@@ -167,6 +191,36 @@ void scene_structure::evolve_shape()
 			 std::sin(alpha2) * Sx * std::cos(phi);
 			
     }
+
+
+}
+
+void scene_structure::create_foam_train(float t0, int k, float foam_th){
+	float d = 0;
+	if (k>N) d = (shape.position[k].z - shape.position[k-N].z)/(shape.position[k].y - shape.position[k-N].y);
+	//std::cout<<d<<"\n";
+	std::random_device rd;
+    std::default_random_engine eng(rd());
+    std::uniform_real_distribution<float> distr(0, 1);
+	if (d > foam_th && distr(eng) < 0.001){
+		particle_system.create_new_particle(t0, d, shape.position[k]);
+		// for (int i = 0; i < 50; i++){
+		// 	vec3 p0 = shape.position[k];
+		// 	p0.x+=0.01*i;
+		// 	particle_system.create_new_particle(t0, d, p0);
+		// }
+	}
+}
+
+void scene_structure::evolve_foam(float t0){
+	size_t const M = initial_position.size();
+	float foam_th = 0.15;
+	std::cout<<particle_system.particles.size()<<"BEFORE\n";
+	int nb_train = 0;
+	for(size_t k=0; k<M; ++k){
+		create_foam_train(t0, k, foam_th);
+	}
+	std::cout<<particle_system.particles.size()<<"AFTER\n";
 }
 
 float K_integration(float K ,float x0, float (*h)(float, float, float)){
