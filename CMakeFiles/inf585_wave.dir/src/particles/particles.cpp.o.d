@@ -1,6 +1,6 @@
-CMakeFiles/inf585_wave.dir/src/scene.cpp.o: \
-  /Users/victor/Documents/ENSTA/inf585/code_inf585/scenes/inf585/inf585_wave/src/scene.cpp \
-  /Users/victor/Documents/ENSTA/inf585/code_inf585/scenes/inf585/inf585_wave/src/scene.hpp \
+CMakeFiles/inf585_wave.dir/src/particles/particles.cpp.o: \
+  /Users/victor/Documents/ENSTA/inf585/code_inf585/scenes/inf585/inf585_wave/src/particles/particles.cpp \
+  /Users/victor/Documents/ENSTA/inf585/code_inf585/scenes/inf585/inf585_wave/src/particles/particles.hpp \
   /Users/victor/Documents/ENSTA/inf585/code_inf585/library/cgp/cgp.hpp \
   /Users/victor/Documents/ENSTA/inf585/code_inf585/library/cgp/base/base.hpp \
   /Users/victor/Documents/ENSTA/inf585/code_inf585/library/cgp/base/error/error.hpp \
@@ -388,7 +388,4 @@ CMakeFiles/inf585_wave.dir/src/scene.cpp.o: \
   /Users/victor/Documents/ENSTA/inf585/code_inf585/library/cgp/interaction/picking/picking_plane/../picking_structure/picking_structure.hpp \
   /Users/victor/Documents/ENSTA/inf585/code_inf585/library/cgp/helper_common_scene/helper_common_scene.hpp \
   /Users/victor/Documents/ENSTA/inf585/code_inf585/library/cgp/helper_common_scene/helper/helper.hpp \
-  /Users/victor/Documents/ENSTA/inf585/code_inf585/library/cgp/helper_common_scene/scene_environment_basic/scene_environment_basic.hpp \
-  /Users/victor/Documents/ENSTA/inf585/code_inf585/scenes/inf585/inf585_wave/src/particles/particles.hpp \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/random \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/numeric
+  /Users/victor/Documents/ENSTA/inf585/code_inf585/library/cgp/helper_common_scene/scene_environment_basic/scene_environment_basic.hpp

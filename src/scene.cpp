@@ -1,17 +1,14 @@
 #include "scene.hpp"
+#include <random>
 
 
 using namespace cgp;
-
-
-
-
 
 void scene_structure::initialize()
 {
 	// Initialize the shapes of the scene
 	// ***************************************** //
-	int N = 100;
+	//int N = 100;
 	
 	int Lfactor = 20;
 	int Wfactor = 50;
@@ -37,7 +34,8 @@ void scene_structure::initialize()
 	floor = mesh_primitive_grid({ 0,0,0 }, { 1,0,0 }, { 1,1,0 }, { 0,1,0 }, N, N2);
 
 	for (int i = 0; i < N * N2; i++){ // adjusting floor position
-		floor.position.at(i)=vec3(Wfactor * floor.position.at(i).x, Lfactor * floor.position.at(i).y, sloped_floor_xy(Lfactor * floor.position.at(i).y, Wfactor * floor.position.at(i).x, 0.23) -floor_offset );
+		floor.position.at(i)=vec3(Wfactor * floor.position.at(i).x, Lfactor * floor.position.at(i).y,
+								 (sloped_floor_xy(Lfactor * floor.position.at(i).y, Wfactor * floor.position.at(i).x, 0.23) -floor_offset)* noise_perlin(floor.position.at(i).x, octave, persistance, gain) );
 	}
 
 	// detecting waterline
@@ -76,7 +74,12 @@ void scene_structure::initialize()
 	shape_waterline_visual.shading.color = { 0.6f, 0.6f, 0.9f };
 	floor_visual.initialize(floor, "Deforming floor");
 	floor_visual.shading.color = { 0.6f, 0.6f, 0.0f };
-		// Reset the color of the shape to white (only the texture image will be seen)
+
+	float sphere_radius = 0.05f;
+	sphere.initialize(mesh_primitive_sphere(sphere_radius), "Sphere");
+	sphere.shading.color = { 1.0f, 1.0f, 1.0f };
+
+	// Reset the color of the shape to white (only the texture image will be seen)
 	shape_visual.shading.color = {1,1,1};
 	shape_waterline_visual.shading.color = {1,1,1};
 	// Load the image and associate the texture id to the structure
@@ -113,7 +116,25 @@ void scene_structure::display()
 	if (gui.display_wireframe)
 		draw_wireframe(shape_waterline_visual, environment, { 0,0,0 });
 	
+	if (foamOn) particle_system.remove_old_particles(timer.t);
+
+	// Evaluate the positions and display the particles
+	int const N = particle_system.particles.size();
+	for (int k = 0; k < N; ++k)
+	{
+		// Current particle
+		particle_structure& particle = particle_system.particles[k];
+
+		// Evaluate the current position of the particle
+		vec3 const p = particle.evaluate_position(timer.t);
+
+		// Display the particle as a sphere
+		sphere.transform.translation = p;
+		draw(sphere, environment);
+	}
+
 	evolve_shape();
+	if (foamOn) evolve_foam(timer.t);
 	shape_visual.update_position(shape.position);
 	shape_waterline_visual.update_position(shape_waterline.position);
 	// Recompute normals on the CPU (given the position and the connectivity currently in the mesh structure)
@@ -131,6 +152,7 @@ void scene_structure::display_gui()
 	ImGui::Checkbox("Frame", &gui.display_frame);
 	ImGui::Checkbox("Enable kludge", &kludge);
 	ImGui::Checkbox("Enable textures", &texturesOn);
+	ImGui::Checkbox("Enable foam (slow)", &foamOn);
 	ImGui::SliderFloat("Time Scale", &timer.scale, 0.0f, 2.0f, "%.1f");
 	ImGui::SliderFloat("Wind Strenght", &wind_str, 0.1f, 10.0f, "%.1f");
 	ImGui::SliderFloat("Wind angle", &wind_angle, 0.7f, 1.7f, "%.01f");
@@ -149,7 +171,7 @@ void scene_structure::evolve_shape()
 {
     int M = initial_position.size();
 
-	int N = 100;
+	//int N = 100;
 	//wind
 	vec3 wind_dir = normalize(vec3(std::cos(wind_angle), std::sin(wind_angle), 0.0));
 	vec3 wind_dir_2;
@@ -199,7 +221,7 @@ void scene_structure::evolve_shape()
 		float train_profile = K_var * GaussianGate(dot(cross(wind_dir, vec3(0,0,1)), p0), 2.5, 20.0, 35.0)  * ( 1.0 + 0.3 * noise_perlin(p0.x,1,0.3,1.0));
 		p.z *= train_profile ;
 
-
+		// deforming the waterline 
 		if (i ==  M/N - 1 - 3 * N){ 
 			for(int l = 0; l < N; l++){
 				shape_waterline.position[l * N + j].y = initial_waterline[j].y + 
@@ -207,11 +229,39 @@ void scene_structure::evolve_shape()
 														2 * K_var * (0.1 + std::abs(wind_angle - 1.6)) * (R *  std::cos(alpha) * Sz * std::sin(phi2) + std::sin(alpha) * Sx * std::cos(phi2))+
 														0.5 * noise_perlin(p0.x,1,0.3,2.0);
 
-				shape_waterline.position[l * N + j].z = 0.05  + sloped_floor_xy(shape_waterline.position[l * N + j].y, shape_waterline.position[l * N + j].x, 0.23) - floor_offset;
+				shape_waterline.position[l * N + j].z = 0.05  + (sloped_floor_xy(shape_waterline.position[l * N + j].y, shape_waterline.position[l * N + j].x, 0.23) - floor_offset) ;//*  noise_perlin(shape_waterline.position[l * N + j].x, octave, persistance, gain);
 			}
 		}
 	}
 		
+}
+
+void scene_structure::create_foam_train(float t0, int k, float foam_th){
+	float d = 0;
+	if (k>N) d = (shape.position[k].z - shape.position[k-N].z)/(shape.position[k].y - shape.position[k-N].y);
+	//std::cout<<d<<"\n";
+	std::random_device rd;
+    std::default_random_engine eng(rd());
+    std::uniform_real_distribution<float> distr(0, 1);
+	if (d > foam_th && distr(eng) < 0.001){
+		particle_system.create_new_particle(t0, d, shape.position[k]);
+		// for (int i = 0; i < 50; i++){
+		// 	vec3 p0 = shape.position[k];
+		// 	p0.x+=0.01*i;
+		// 	particle_system.create_new_particle(t0, d, p0);
+		// }
+	}
+}
+
+void scene_structure::evolve_foam(float t0){
+	size_t const M = initial_position.size();
+	float foam_th = 0.15;
+	//std::cout<<particle_system.particles.size()<<"BEFORE\n";
+	int nb_train = 0;
+	for(size_t k=0; k<M; ++k){
+		create_foam_train(t0, k, foam_th);
+	}
+	//std::cout<<particle_system.particles.size()<<"AFTER\n";
 }
 
 float K_integration(float K ,float x0, float (*h)(float, float, float)){
@@ -248,8 +298,9 @@ float valley_wall(float x, float position, float width){
 	return 0.6;
 }
 
-float atan_floor(float x, float position, float width ){
-	return 0.3 * (std::atan(20 * (x - 10)) - 1.6) + 0.07*x;
+float atan_floor(float x, float dist_from_shore, float steepness ){
+	return 0.5*(std::atan(steepness*(x-dist_from_shore))-1.7);
+	//return 0.3 * (std::atan(20 * (x - 10)) - 1.6) + 0.07*x;
 }
 
 float Gaussian(float x, float std, float avg ){

@@ -165,6 +165,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/inf585_wave.dir/Users/victor/Documents/ENSTA/inf585/code_inf585/library/third_party/src/simplexnoise/simplexnoise1234.cpp.o.d"
   "CMakeFiles/inf585_wave.dir/src/main.cpp.o"
   "CMakeFiles/inf585_wave.dir/src/main.cpp.o.d"
+  "CMakeFiles/inf585_wave.dir/src/particles/particles.cpp.o"
+  "CMakeFiles/inf585_wave.dir/src/particles/particles.cpp.o.d"
   "CMakeFiles/inf585_wave.dir/src/scene.cpp.o"
   "CMakeFiles/inf585_wave.dir/src/scene.cpp.o.d"
   "inf585_wave"

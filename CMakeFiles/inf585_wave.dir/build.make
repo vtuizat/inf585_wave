@@ -1231,10 +1231,24 @@ CMakeFiles/inf585_wave.dir/src/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/inf585_wave.dir/src/main.cpp.s"
 	g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/victor/Documents/ENSTA/inf585/code_inf585/scenes/inf585/inf585_wave/src/main.cpp -o CMakeFiles/inf585_wave.dir/src/main.cpp.s
 
+CMakeFiles/inf585_wave.dir/src/particles/particles.cpp.o: CMakeFiles/inf585_wave.dir/flags.make
+CMakeFiles/inf585_wave.dir/src/particles/particles.cpp.o: src/particles/particles.cpp
+CMakeFiles/inf585_wave.dir/src/particles/particles.cpp.o: CMakeFiles/inf585_wave.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/victor/Documents/ENSTA/inf585/code_inf585/scenes/inf585/inf585_wave/CMakeFiles --progress-num=$(CMAKE_PROGRESS_84) "Building CXX object CMakeFiles/inf585_wave.dir/src/particles/particles.cpp.o"
+	g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/inf585_wave.dir/src/particles/particles.cpp.o -MF CMakeFiles/inf585_wave.dir/src/particles/particles.cpp.o.d -o CMakeFiles/inf585_wave.dir/src/particles/particles.cpp.o -c /Users/victor/Documents/ENSTA/inf585/code_inf585/scenes/inf585/inf585_wave/src/particles/particles.cpp
+
+CMakeFiles/inf585_wave.dir/src/particles/particles.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/inf585_wave.dir/src/particles/particles.cpp.i"
+	g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/victor/Documents/ENSTA/inf585/code_inf585/scenes/inf585/inf585_wave/src/particles/particles.cpp > CMakeFiles/inf585_wave.dir/src/particles/particles.cpp.i
+
+CMakeFiles/inf585_wave.dir/src/particles/particles.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/inf585_wave.dir/src/particles/particles.cpp.s"
+	g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/victor/Documents/ENSTA/inf585/code_inf585/scenes/inf585/inf585_wave/src/particles/particles.cpp -o CMakeFiles/inf585_wave.dir/src/particles/particles.cpp.s
+
 CMakeFiles/inf585_wave.dir/src/scene.cpp.o: CMakeFiles/inf585_wave.dir/flags.make
 CMakeFiles/inf585_wave.dir/src/scene.cpp.o: src/scene.cpp
 CMakeFiles/inf585_wave.dir/src/scene.cpp.o: CMakeFiles/inf585_wave.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/victor/Documents/ENSTA/inf585/code_inf585/scenes/inf585/inf585_wave/CMakeFiles --progress-num=$(CMAKE_PROGRESS_84) "Building CXX object CMakeFiles/inf585_wave.dir/src/scene.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/victor/Documents/ENSTA/inf585/code_inf585/scenes/inf585/inf585_wave/CMakeFiles --progress-num=$(CMAKE_PROGRESS_85) "Building CXX object CMakeFiles/inf585_wave.dir/src/scene.cpp.o"
 	g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/inf585_wave.dir/src/scene.cpp.o -MF CMakeFiles/inf585_wave.dir/src/scene.cpp.o.d -o CMakeFiles/inf585_wave.dir/src/scene.cpp.o -c /Users/victor/Documents/ENSTA/inf585/code_inf585/scenes/inf585/inf585_wave/src/scene.cpp
 
 CMakeFiles/inf585_wave.dir/src/scene.cpp.i: cmake_force
@@ -1330,6 +1344,7 @@ inf585_wave_OBJECTS = \
 "CMakeFiles/inf585_wave.dir/Users/victor/Documents/ENSTA/inf585/code_inf585/library/third_party/src/lodepng/lodepng.cpp.o" \
 "CMakeFiles/inf585_wave.dir/Users/victor/Documents/ENSTA/inf585/code_inf585/library/third_party/src/simplexnoise/simplexnoise1234.cpp.o" \
 "CMakeFiles/inf585_wave.dir/src/main.cpp.o" \
+"CMakeFiles/inf585_wave.dir/src/particles/particles.cpp.o" \
 "CMakeFiles/inf585_wave.dir/src/scene.cpp.o"
 
 # External object files for target inf585_wave
@@ -1418,11 +1433,12 @@ inf585_wave: CMakeFiles/inf585_wave.dir/Users/victor/Documents/ENSTA/inf585/code
 inf585_wave: CMakeFiles/inf585_wave.dir/Users/victor/Documents/ENSTA/inf585/code_inf585/library/third_party/src/lodepng/lodepng.cpp.o
 inf585_wave: CMakeFiles/inf585_wave.dir/Users/victor/Documents/ENSTA/inf585/code_inf585/library/third_party/src/simplexnoise/simplexnoise1234.cpp.o
 inf585_wave: CMakeFiles/inf585_wave.dir/src/main.cpp.o
+inf585_wave: CMakeFiles/inf585_wave.dir/src/particles/particles.cpp.o
 inf585_wave: CMakeFiles/inf585_wave.dir/src/scene.cpp.o
 inf585_wave: CMakeFiles/inf585_wave.dir/build.make
 inf585_wave: /usr/local/lib/libglfw.3.3.dylib
 inf585_wave: CMakeFiles/inf585_wave.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/victor/Documents/ENSTA/inf585/code_inf585/scenes/inf585/inf585_wave/CMakeFiles --progress-num=$(CMAKE_PROGRESS_85) "Linking CXX executable inf585_wave"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/victor/Documents/ENSTA/inf585/code_inf585/scenes/inf585/inf585_wave/CMakeFiles --progress-num=$(CMAKE_PROGRESS_86) "Linking CXX executable inf585_wave"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/inf585_wave.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

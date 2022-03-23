@@ -6,7 +6,7 @@
 
 #include "cgp/cgp.hpp"
 #include <string>
-
+#include "particles/particles.hpp"
 
 
 struct gui_parameters {
@@ -43,18 +43,24 @@ struct scene_structure {
 	cgp::mesh_drawable shape_visual;
 	cgp::mesh_drawable shape_waterline_visual;
 	cgp::mesh_drawable floor_visual;
+
+	int N = 100;
 	float wind_str = 2.0;
 	float wind_angle = 1.6;
 	float floor_offset = 5.0;
 	float K_var = 4.0;
 	bool kludge = true;
 	bool texturesOn = true;
+	bool foamOn = false;
+
 	std::vector<float> y_collision;
 	std::vector<float> y_speed_waterline;
 
 	cgp::timer_basic timer; // A timer to have access to the elapsed time
 	cgp::scene_environment_basic_camera_spherical_coords environment; // Standard environment controler
 	gui_parameters gui;                       // Standard GUI element storage
+
+	particle_system_structure particle_system;
 
 	// ****************************** //
 	// Functions
@@ -66,6 +72,15 @@ struct scene_structure {
 
 	
 	void evolve_shape();
+	void evolve_foam(float t0);
+	void create_foam_train(float t0, int k, float foam_th);
+
+
+	float floor_steepness = 40;
+	float floor_dist_from_shore = 0.4;
+	int octave = 3;
+	float persistance = 0.2;
+	float gain = 1.0;
 
 };
 float K_integration(float K ,float x0, float (*h)(float, float, float));
