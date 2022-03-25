@@ -81,7 +81,7 @@ void scene_structure::initialize()
 
 	// Reset the color of the shape to white (only the texture image will be seen)
 	shape_visual.shading.color = {1,1,1};
-	shape_waterline_visual.shading.color = {1,1,1};
+	//shape_waterline_visual.shading.color = {1,1,1};
 	// Load the image and associate the texture id to the structure
 	if (texturesOn){
 		shape_visual.texture = opengl_load_texture_image("assets/sea.jpg");
@@ -229,7 +229,7 @@ void scene_structure::evolve_shape()
 														2 * K_var * (0.1 + std::abs(wind_angle - 1.6)) * (R *  std::cos(alpha) * Sz * std::sin(phi2) + std::sin(alpha) * Sx * std::cos(phi2))+
 														0.5 * noise_perlin(p0.x,1,0.3,2.0);
 
-				shape_waterline.position[l * N + j].z = 0.05  + (sloped_floor_xy(shape_waterline.position[l * N + j].y, shape_waterline.position[l * N + j].x, 0.23) - floor_offset) ;//*  noise_perlin(shape_waterline.position[l * N + j].x, octave, persistance, gain);
+				shape_waterline.position[l * N + j].z = 0.05  + (sloped_floor_xy(shape_waterline.position[l * N + j].y, shape_waterline.position[l * N + j].x, 0.23) - floor_offset) *  noise_perlin(shape_waterline.position[l * N + j].x/50, octave, persistance, gain);
 			}
 		}
 	}
