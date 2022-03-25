@@ -58,7 +58,7 @@ struct scene_structure {
 	
 	void evolve_shape();
 	void evolve_foam(float t0);
-	void create_foam_train(float t0, int k, float foam_th);
+	void create_foam(float t0, int k, float foam_th);
 	
 	float wind_str = 2.0;
 	float wind_angle = 1.6;

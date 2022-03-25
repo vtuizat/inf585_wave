@@ -746,11 +746,19 @@ imgui_user.h
 
 /mnt/c/Users/hugon/INF585/code_inf585/library/third_party/src/imgui/imgui_impl_opengl3.h
 
-/mnt/c/Users/hugon/INF585/code_inf585/scenes/inf585/inf585_wave/src/particles/particles.cpp
-particles.hpp
-/mnt/c/Users/hugon/INF585/code_inf585/scenes/inf585/inf585_wave/src/particles/particles.hpp
-
 /mnt/c/Users/hugon/INF585/code_inf585/scenes/inf585/inf585_wave/src/particles/particles.hpp
 cgp/cgp.hpp
 /mnt/c/Users/hugon/INF585/code_inf585/scenes/inf585/inf585_wave/src/particles/cgp/cgp.hpp
+
+/mnt/c/Users/hugon/INF585/code_inf585/scenes/inf585/inf585_wave/src/scene.cpp
+scene.hpp
+/mnt/c/Users/hugon/INF585/code_inf585/scenes/inf585/inf585_wave/src/scene.hpp
+random
+-
+
+/mnt/c/Users/hugon/INF585/code_inf585/scenes/inf585/inf585_wave/src/scene.hpp
+cgp/cgp.hpp
+/mnt/c/Users/hugon/INF585/code_inf585/scenes/inf585/inf585_wave/src/cgp/cgp.hpp
+particles/particles.hpp
+/mnt/c/Users/hugon/INF585/code_inf585/scenes/inf585/inf585_wave/src/particles/particles.hpp
 

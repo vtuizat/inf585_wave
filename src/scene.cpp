@@ -195,7 +195,7 @@ void scene_structure::evolve_shape()
 
 }
 
-void scene_structure::create_foam_train(float t0, int k, float foam_th){
+void scene_structure::create_foam(float t0, int k, float foam_th){
 	float d = 0;
 	if (k>N) d = (shape.position[k].z - shape.position[k-N].z)/(shape.position[k].y - shape.position[k-N].y);
 	//std::cout<<d<<"\n";
@@ -204,23 +204,18 @@ void scene_structure::create_foam_train(float t0, int k, float foam_th){
     std::uniform_real_distribution<float> distr(0, 1);
 	if (d > foam_th && distr(eng) < 0.001){
 		particle_system.create_new_particle(t0, d, shape.position[k]);
-		// for (int i = 0; i < 50; i++){
-		// 	vec3 p0 = shape.position[k];
-		// 	p0.x+=0.01*i;
-		// 	particle_system.create_new_particle(t0, d, p0);
-		// }
 	}
 }
 
 void scene_structure::evolve_foam(float t0){
 	size_t const M = initial_position.size();
 	float foam_th = 0.15;
-	std::cout<<particle_system.particles.size()<<"BEFORE\n";
+	// std::cout<<particle_system.particles.size()<<"BEFORE\n";
 	int nb_train = 0;
 	for(size_t k=0; k<M; ++k){
-		create_foam_train(t0, k, foam_th);
+		create_foam(t0, k, foam_th);
 	}
-	std::cout<<particle_system.particles.size()<<"AFTER\n";
+	// std::cout<<particle_system.particles.size()<<"AFTER\n";
 }
 
 float K_integration(float K ,float x0, float (*h)(float, float, float)){
