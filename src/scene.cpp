@@ -24,8 +24,6 @@ void scene_structure::initialize()
 	// Create a visual frame representing the coordinate system
 	global_frame.initialize(mesh_primitive_frame(), "Frame");
 
-	// Create the ground plane
-	ground.initialize(mesh_primitive_quadrangle({-2,-2,-1}, {2,-2,-1}, {2, 2,-1}, {-2, 2,-1}), "Ground");
 
 	// send data to GPU and store it into a curve_drawable structure
 
@@ -34,8 +32,23 @@ void scene_structure::initialize()
 	floor = mesh_primitive_grid({ 0,0,0 }, { 1,0,0 }, { 1,1,0 }, { 0,1,0 }, N, N2);
 
 	for (int i = 0; i < N * N2; i++){ // adjusting floor position
-		floor.position.at(i)=vec3(Wfactor * floor.position.at(i).x, Lfactor * floor.position.at(i).y,
-								 (sloped_floor_xy(Lfactor * floor.position.at(i).y, Wfactor * floor.position.at(i).x, 0.23) -floor_offset)* noise_perlin(floor.position.at(i).x, octave, persistance, gain) );
+
+		switch (floor_type){
+		case 0:
+			floor.position.at(i)=vec3(Wfactor * floor.position.at(i).x, Lfactor * floor.position.at(i).y,
+							(sloped_floor_xy(Lfactor * floor.position.at(i).y, Wfactor * floor.position.at(i).x, 0.23) -floor_offset)
+							* noise_perlin( floor.position.at(i).x, octave, persistance, gain) );
+			break;
+		case 1:
+			floor.position.at(i)=vec3(Wfactor * floor.position.at(i).x, Lfactor * floor.position.at(i).y,
+							( sloped_floor(Lfactor *floor.position.at(i).y, 2.0, 0.23) -floor_offset));
+			break;
+		case 2:
+			floor.position.at(i)=vec3(Wfactor * floor.position.at(i).x, Lfactor * floor.position.at(i).y,
+							(atan_floor(Lfactor * floor.position.at(i).y, floor_dist_from_shore, floor_steepness) - floor_offset)
+							* noise_perlin(floor.position.at(i).x, octave, persistance, gain) ); 
+			break;
+		}
 	}
 
 	// detecting waterline
@@ -49,7 +62,7 @@ void scene_structure::initialize()
 		k = i / N;
 		j = i % N;
 
-		if (std::abs(floor.position.at(i).z) < epsilon && floor.position.at(i).y < y_collision[j]) {
+		if (-floor.position.at(i).z < epsilon && floor.position.at(i).y < y_collision[j]) {
 			y_collision[j] = floor.position.at(i).y;
 		}
 	}
@@ -66,7 +79,6 @@ void scene_structure::initialize()
 	environment.camera.look_at({ 5.0f,-4.0f,2.0f }, shape.position.at(N * N * Lfactor / 2 - N/2 ));
 	initial_position = shape.position;
 	initial_waterline = shape_waterline.position;
-	//for (int l = 0; l < N; l++) y_collision[l] = initial_position[initial_position.size()-1].y;
 	initial_time = timer.t;
 	shape_visual.initialize(shape, "Deforming shape");
 	shape_visual.shading.color = { 0.6f, 0.6f, 0.9f };
@@ -81,7 +93,7 @@ void scene_structure::initialize()
 
 	// Reset the color of the shape to white (only the texture image will be seen)
 	shape_visual.shading.color = {1,1,1};
-	//shape_waterline_visual.shading.color = {1,1,1};
+	shape_waterline_visual.shading.color = {1,1,1};
 	// Load the image and associate the texture id to the structure
 	if (texturesOn){
 		shape_visual.texture = opengl_load_texture_image("assets/sea.jpg");
@@ -157,6 +169,7 @@ void scene_structure::display_gui()
 	ImGui::SliderFloat("Wind Strenght", &wind_str, 0.1f, 10.0f, "%.1f");
 	ImGui::SliderFloat("Wind angle", &wind_angle, 0.7f, 1.7f, "%.01f");
 	ImGui::SliderFloat("floor offset", &floor_offset, 0.0f, 10.f, "%.1f");
+	ImGui::SliderInt("Floor Type", &floor_type, 0, 2, "%1.d");
 	ImGui::SliderFloat("Wave height", &K_var, 0.0f, 8.f, "%.1f");
 	ImGui::Checkbox("Wireframe", &gui.display_wireframe);
 	bool const restart = ImGui::Button("Restart");
@@ -171,7 +184,6 @@ void scene_structure::evolve_shape()
 {
     int M = initial_position.size();
 
-	//int N = 100;
 	//wind
 	vec3 wind_dir = normalize(vec3(std::cos(wind_angle), std::sin(wind_angle), 0.0));
 	vec3 wind_dir_2;
@@ -228,9 +240,18 @@ void scene_structure::evolve_shape()
 														2 * K_var * (shape.position[l * M/N + j].z * (1 + 0.001 / train_profile) - initial_position[l * M/N + j].z) +
 														2 * K_var * (0.1 + std::abs(wind_angle - 1.6)) * (R *  std::cos(alpha) * Sz * std::sin(phi2) + std::sin(alpha) * Sx * std::cos(phi2))+
 														0.5 * noise_perlin(p0.x,1,0.3,2.0);
-
-				shape_waterline.position[l * N + j].z = 0.05  + (sloped_floor_xy(shape_waterline.position[l * N + j].y, shape_waterline.position[l * N + j].x, 0.23) - floor_offset) *  noise_perlin(shape_waterline.position[l * N + j].x/50, octave, persistance, gain);
-			}
+				switch (floor_type){
+				case 0:
+					shape_waterline.position[l * N + j].z = 0.05  + (sloped_floor_xy(shape_waterline.position[l * N + j].y, shape_waterline.position[l * N + j].x, 0.23) - floor_offset) *  noise_perlin(shape_waterline.position[l * N + j].x/50, octave, persistance, gain);
+					break;
+				case 1:
+					shape_waterline.position[l * N + j].z = 0.05  + (sloped_floor(shape_waterline.position[l * N + j].y, 2.0, 0.23) - floor_offset);
+					break;
+				case 2:
+					shape_waterline.position[l * N + j].z = 0.05  + (atan_floor(shape_waterline.position[l * N + j].y, floor_dist_from_shore, floor_steepness) - floor_offset) * noise_perlin(shape_waterline.position[l * N + j].x/50, octave, persistance, gain);
+					break;
+				}
+			}	
 		}
 	}
 		
@@ -239,29 +260,22 @@ void scene_structure::evolve_shape()
 void scene_structure::create_foam_train(float t0, int k, float foam_th){
 	float d = 0;
 	if (k>N) d = (shape.position[k].z - shape.position[k-N].z)/(shape.position[k].y - shape.position[k-N].y);
-	//std::cout<<d<<"\n";
 	std::random_device rd;
     std::default_random_engine eng(rd());
     std::uniform_real_distribution<float> distr(0, 1);
 	if (d > foam_th && distr(eng) < 0.001){
 		particle_system.create_new_particle(t0, d, shape.position[k]);
-		// for (int i = 0; i < 50; i++){
-		// 	vec3 p0 = shape.position[k];
-		// 	p0.x+=0.01*i;
-		// 	particle_system.create_new_particle(t0, d, p0);
-		// }
+		
 	}
 }
 
 void scene_structure::evolve_foam(float t0){
 	size_t const M = initial_position.size();
 	float foam_th = 0.15;
-	//std::cout<<particle_system.particles.size()<<"BEFORE\n";
 	int nb_train = 0;
 	for(size_t k=0; k<M; ++k){
 		create_foam_train(t0, k, foam_th);
 	}
-	//std::cout<<particle_system.particles.size()<<"AFTER\n";
 }
 
 float K_integration(float K ,float x0, float (*h)(float, float, float)){
@@ -299,8 +313,8 @@ float valley_wall(float x, float position, float width){
 }
 
 float atan_floor(float x, float dist_from_shore, float steepness ){
-	return 0.5*(std::atan(steepness*(x-dist_from_shore))-1.7);
-	//return 0.3 * (std::atan(20 * (x - 10)) - 1.6) + 0.07*x;
+	return 0.5*(std::atan(steepness*(x-dist_from_shore))) + 0.17*x + 1.6;
+
 }
 
 float Gaussian(float x, float std, float avg ){

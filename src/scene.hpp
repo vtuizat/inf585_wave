@@ -48,6 +48,7 @@ struct scene_structure {
 	float wind_str = 2.0;
 	float wind_angle = 1.6;
 	float floor_offset = 5.0;
+	int floor_type = 0;
 	float K_var = 4.0;
 	bool kludge = true;
 	bool texturesOn = true;
@@ -77,10 +78,11 @@ struct scene_structure {
 
 
 	float floor_steepness = 40;
-	float floor_dist_from_shore = 0.4;
-	int octave = 3;
+	float floor_dist_from_shore = 8;
+	int octave = 4;
 	float persistance = 0.2;
 	float gain = 1.0;
+
 
 };
 float K_integration(float K ,float x0, float (*h)(float, float, float));
